@@ -138,7 +138,7 @@ class CasXmiDeserializer:
                 if feature_name == "sofa":
                     continue
 
-                if typesystem.is_primitive(feature.rangeTypeName) or typesystem.is_primitive_collection(fs.type):
+                if typesystem.is_primitive(feature.rangeTypeName) or typesystem.is_primitive_collection(feature.rangeTypeName):
                     # TODO: Parse feature values to their real type here, e.g. parse ints or floats
                     continue
 
@@ -326,6 +326,11 @@ class CasXmiSerializer:
                     child.text = e
             elif feature_name == "sofa" or cas.typesystem.is_primitive(feature.rangeTypeName):
                 elem.attrib[feature_name] = str(value)
+            elif cas.typesystem.is_primitive_collection(feature.rangeTypeName):
+                # list of primitive values are serialized as series of subelements
+                for _val in value:
+                    val_el = etree.SubElement(elem, feature_name)
+                    val_el.text = _val
             elif cas.typesystem.is_collection(feature.rangeTypeName):
                 elements = " ".join(str(e.xmiID) for e in value)
                 elem.attrib[feature_name] = elements
